@@ -13,8 +13,8 @@
 		<Product>BingoSync</Product>
 		<Description>A Hollow Knight Mod</Description>
 		<Copyright>Copyright ©  2024</Copyright>
-		<AssemblyVersion>1.3.6.0</AssemblyVersion>
-		<FileVersion>1.3.6.0</FileVersion>
+		<AssemblyVersion>1.4.4.3</AssemblyVersion>
+		<FileVersion>1.4.4.3</FileVersion>
 		<OutputPath>bin\$(Configuration)\</OutputPath>
 		<LangVersion>latest</LangVersion>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -339,6 +339,12 @@
 		<Reference Include="ItemChanger">
 			<HintPath>$(HollowKnightRefs)/Mods/ItemChanger/ItemChanger.dll</HintPath>
 		</Reference>
+		<Reference Include="ItemSync">
+			<HintPath>$(HollowKnightRefs)/Mods/ItemSync/ItemSync.dll</HintPath>
+		</Reference>
+		<Reference Include="MultiWorldLib">
+			<HintPath>$(HollowKnightRefs)/Mods/MultiWorldLib/MultiWorldLib.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 	<ItemGroup>
 		<None Include=".gitignore" />
@@ -346,9 +352,14 @@
 		<None Include="Resources\.gitignore" />
 		<None Include="Resources\Squares\*.json" />
 		<None Include="Resources\Images\*.png" />
+		<None Include="Resources\Images\ColorIcons\*.png" />
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Resources\Sounds\*.wav" />
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="Resources\Squares\*.json" />
 		<EmbeddedResource Include="Resources\Images\*.png" />
+		<EmbeddedResource Include="Resources\Images\ColorIcons\*.png" />
 	</ItemGroup>
 </Project>

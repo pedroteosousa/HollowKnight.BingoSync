@@ -7,30 +7,34 @@
             orig(self, convName, sheetName);
             // Lemm with Crest
             if (convName == "RELICDEALER_DUNG") {
-                BingoTracker.UpdateBoolean("metLemmWithCrest", true);
+                GoalCompletionTracker.UpdateBoolean("metLemmWithCrest", true);
             }
             // Fluke Hermit
             if (convName.StartsWith("FLUKE_HERMIT")) {
-                BingoTracker.UpdateBoolean("metFlukeHermit", true);
+                GoalCompletionTracker.UpdateBoolean("metFlukeHermit", true);
             }
             // Cornifer
             if (sheetName == "Cornifer") {
                 var scene = GameManager.instance.GetSceneNameString();
                 var variableName = $"cornifer_{scene}";
-                BingoTracker.UpdateBoolean(variableName, true);
+                GoalCompletionTracker.UpdateBoolean(variableName, true);
             }
             // Mr Mushroom
             if (convName.StartsWith("MR_MUSHROOM")) {
-                BingoTracker.UpdateBoolean("metMrMushroom", true);
+                GoalCompletionTracker.UpdateBoolean("metMrMushroom", true);
             }
             // Hornet at Fountain
             if (convName.StartsWith("HORNET_FOUNTAIN"))
             {
-                BingoTracker.UpdateBoolean("talkedToHornetAtCoTFountain", true);
+                GoalCompletionTracker.UpdateBoolean("talkedToHornetAtCoTFountain", true);
             }
             // Hornet at Beast's Den
             if (convName.StartsWith("HORNET_SPIDER_TOWN")) {
-                BingoTracker.UpdateBoolean("metHornetBeastsDen", true);
+                GoalCompletionTracker.UpdateBoolean("metHornetBeastsDen", true);
+            }
+            // Salubra overcharmed
+            if (convName.StartsWith("CHARMSLUG") && PlayerData.instance.overcharmed) {
+                GoalCompletionTracker.UpdateBoolean("talkedToSalubraOvercharmed", true);
             }
         }
     }

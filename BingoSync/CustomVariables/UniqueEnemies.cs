@@ -11,21 +11,21 @@ namespace BingoSync.CustomVariables
             var enemyName = field.GetValue(enemyDeathEffects);
             var scene = GameManager.instance.GetSceneNameString();
             var variableName = $"killed_{enemyDeathEffects.name}_{scene}";
-            var alreadyKilled = BingoTracker.GetBoolean(variableName);
-            BingoTracker.UpdateBoolean(variableName, true);
+            var alreadyKilled = GoalCompletionTracker.GetBoolean(variableName);
+            GoalCompletionTracker.UpdateBoolean(variableName, true);
             if (alreadyKilled) {
                 return;
             }
             var countVariableName = $"killedUnique_{enemyName}";
-            var uniqueCount = BingoTracker.GetInteger(countVariableName);
-            BingoTracker.UpdateInteger(countVariableName, uniqueCount + 1);
+            var uniqueCount = GoalCompletionTracker.GetInteger(countVariableName);
+            GoalCompletionTracker.UpdateInteger(countVariableName, uniqueCount + 1);
         }
 
         public static void HitLightseed(On.ScuttlerControl.orig_Hit orig, ScuttlerControl self, HitInstance damageInstance)
         {
             orig(self, damageInstance);
             if (!self.name.StartsWith("Orange Scuttler")) return;
-            BingoTracker.UpdateBoolean("killedLightseed", true);
+            GoalCompletionTracker.UpdateBoolean("killedLightseed", true);
         }
 
         public static void KillGulkaWithSpikeBall(On.HealthManager.orig_TakeDamage orig, HealthManager self, HitInstance hitInstance)
@@ -34,7 +34,7 @@ namespace BingoSync.CustomVariables
             if (self.gameObject == null || !self.gameObject.name.StartsWith("Plant Turret")) return;
             if (hitInstance.Source == null || !hitInstance.Source.name.StartsWith("Spike Ball")) return;
             if (!self.GetIsDead()) return;
-            BingoTracker.UpdateBoolean("killGulkaWithSpikeBall", true);
+            GoalCompletionTracker.UpdateBoolean("killGulkaWithSpikeBall", true);
         }
 
         private static bool IsOoma(string objectName)
@@ -46,14 +46,14 @@ namespace BingoSync.CustomVariables
         {
             var roomName = GameManager.instance.GetSceneNameString();
             var variableName = $"killedOomaWithMinionCharm_{objectName}_{roomName}";
-            var alreadyKilled = BingoTracker.GetBoolean(variableName);
-            BingoTracker.UpdateBoolean(variableName, true);
+            var alreadyKilled = GoalCompletionTracker.GetBoolean(variableName);
+            GoalCompletionTracker.UpdateBoolean(variableName, true);
             if (alreadyKilled) {
                 return;
             }
             var countVariableName = "killsOomaWithMinionCharm";
-            var uniqueCount = BingoTracker.GetInteger(countVariableName);
-            BingoTracker.UpdateInteger(countVariableName, uniqueCount + 1);
+            var uniqueCount = GoalCompletionTracker.GetInteger(countVariableName);
+            GoalCompletionTracker.UpdateInteger(countVariableName, uniqueCount + 1);
         }
 
         public static void OomasKilledWithMinions_GlowingWomb(On.HealthManager.orig_TakeDamage orig, HealthManager self, HitInstance hitInstance)

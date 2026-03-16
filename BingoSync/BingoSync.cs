@@ -1,10 +1,10 @@
-﻿using Modding;
+﻿using BingoSync.CustomGoals;
+using BingoSync.GameUI;
+using BingoSync.Interfaces;
 using BingoSync.ModMenu;
 using BingoSync.Settings;
-using BingoSync.CustomGoals;
-using BingoSync.GameUI;
-using UnityEngine;
-using BingoSync.Helpers;
+using Modding;
+using Newtonsoft.Json;
 
 namespace BingoSync
 {
@@ -12,25 +12,15 @@ namespace BingoSync
     {
         new public string GetName() => "BingoSync";
 
-        public static string version = "1.3.6.0";
+        public static string version = "1.4.4.5";
         public override string GetVersion() => version;
 
-        public override int LoadPriority() => 0;
+        private static readonly string DefaultSaveSettings = JsonConvert.SerializeObject(new SaveSettings());
 
         public override void Initialize()
         {
-            Controller.Setup(Log);
-            Variables.Setup(Log);
-            Hooks.Setup();
-            RetryHelper.Setup(Log);
-            MenuUI.Setup(Log);
-            BingoTracker.Setup(Log);
-            BingoBoardUI.Setup(Log);
-            GameModesManager.Setup(Log);
-
-            ModHooks.FinishedLoadingModsHook += Controller.AfterGoalPacksLoaded;
-            // creates a permanent GameObject which calls GlobalKeybindHelper.Update every frame
-            GameObject.DontDestroyOnLoad(new GameObject("update_object", [typeof(GlobalKeybindHelper)]));
+            OrderedLoader.Setup(Log);
+            OrderedLoader.LoadInternal();
         }
 
         public static void ShowMenu()
@@ -45,21 +35,26 @@ namespace BingoSync
 
         public void OnLoadLocal(SaveSettings s)
         {
-            BingoTracker.Settings = s;
+            GoalCompletionTracker.Variables = s;
+            if(JsonConvert.SerializeObject(s) == DefaultSaveSettings)
+            {
+                return;
+            }
+            if (Controller.GlobalSettings.MarkCompletedGoalsOnLoadSavefile)
+            {
+                GoalCompletionTracker.ClearFinishedGoals();
+                GoalCompletionTracker.BroadcastAllGoalStates();
+            }
         }
 
         public SaveSettings OnSaveLocal()
         {
-            return BingoTracker.Settings;
+            return GoalCompletionTracker.Variables;
         }
 
         public void OnLoadGlobal(ModSettings s)
         {
             Controller.GlobalSettings = s;
-
-            // transition from having CustomGameModes in the global settings to separate files for each
-            // it'll be removed at some point after a few updates, after everyone transitions
-            Controller.MoveGameModesFromSettings();
 
             GameModesManager.LoadCustomGameModesFromFiles();
             MenuUI.LoadDefaults();

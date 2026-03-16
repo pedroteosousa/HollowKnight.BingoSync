@@ -12,7 +12,7 @@ namespace BingoSync.CustomVariables
         public static void MarkLoreTabletAsRead(string roomName, string objectName)
         {
             string variableName = $"readLoreTablet_{roomName}_{objectName}";
-            BingoTracker.UpdateBoolean(variableName, true);
+            GoalCompletionTracker.UpdateBoolean(variableName, true);
         }
 
         public static void CreateLoreTabletTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)

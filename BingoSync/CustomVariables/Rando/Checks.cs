@@ -8,12 +8,12 @@ namespace BingoSync.CustomVariables.Rando
         public static void AfterGiveItem(ReadOnlyGiveEventArgs args)
         {
             var variableName = $"gotCheck_{args.Placement.Name}";
-            BingoTracker.UpdateBoolean(variableName, true);
+            GoalCompletionTracker.UpdateBoolean(variableName, true);
 
             if (args.Placement.AllObtained())
             {
                 var allObtainedVariableName = $"allObtained_{args.Placement.Name}";
-                BingoTracker.UpdateBoolean(allObtainedVariableName, true);
+                GoalCompletionTracker.UpdateBoolean(allObtainedVariableName, true);
             }
         }
 
@@ -21,7 +21,7 @@ namespace BingoSync.CustomVariables.Rando
         {
             if (args.NewFlags == VisitState.None) return;
             var variableName = $"checked_{args.Placement.Name}";
-            BingoTracker.UpdateBoolean(variableName, true);
+            GoalCompletionTracker.UpdateBoolean(variableName, true);
         }
 
         public static void GetRandomizedPlacements() {
@@ -33,7 +33,7 @@ namespace BingoSync.CustomVariables.Rando
                 foreach (var placement in placementKeys)
                 {
                     var variableName = $"randomized_{placement}";
-                    BingoTracker.UpdateBoolean(variableName, true);
+                    GoalCompletionTracker.UpdateBoolean(variableName, true);
                 }
                 return Task.CompletedTask;
             }, 10, nameof(GetRandomizedPlacements));

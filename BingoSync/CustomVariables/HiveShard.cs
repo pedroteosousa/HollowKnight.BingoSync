@@ -14,7 +14,7 @@ namespace BingoSync.CustomVariables
             if (zone != MapZone.HIVE)
                 return orig;
 
-            BingoTracker.UpdateBoolean(variableName, true);
+            GoalCompletionTracker.UpdateBoolean(variableName, true);
             return orig;
         }
     }

@@ -16,13 +16,13 @@ namespace BingoSync.CustomVariables
             if (self == null || self.FsmName != fsmName || !hasStartRestState) return;
             startRestState.AddCustomAction(() => {
                 string variableName = $"bench_{GameManager.instance.GetSceneNameString()}";
-                BingoTracker.UpdateBoolean(variableName, true);
+                GoalCompletionTracker.UpdateBoolean(variableName, true);
             });
             bool hasRestingState = self.TryGetState(restingStateName, out FsmState restingState);
             if (!hasRestingState) return;
             restingState.AddCustomAction(() => {
                 string variableName = $"bench_{GameManager.instance.GetSceneNameString()}";
-                BingoTracker.UpdateBoolean(variableName, true);
+                GoalCompletionTracker.UpdateBoolean(variableName, true);
             });
         }
     }

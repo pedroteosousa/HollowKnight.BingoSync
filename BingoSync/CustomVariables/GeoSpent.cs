@@ -10,7 +10,7 @@ namespace BingoSync.CustomVariables
         public static void UpdateGeoText(On.GeoCounter.orig_Update orig, GeoCounter self)
         {
             orig(self);
-            var geoSpent = BingoTracker.GetInteger(variableName);
+            var geoSpent = GoalCompletionTracker.GetInteger(variableName);
             self.geoTextMesh.text = $"{counterCurrent.GetValue(self)} ({geoSpent} Spent)";
         }
 
@@ -21,8 +21,8 @@ namespace BingoSync.CustomVariables
             {
                 return;
             }
-            var geoSpent = BingoTracker.GetInteger(variableName);
-            BingoTracker.UpdateInteger(variableName, geoSpent + geo);
+            var geoSpent = GoalCompletionTracker.GetInteger(variableName);
+            GoalCompletionTracker.UpdateInteger(variableName, geoSpent + geo);
         }
     }
 }

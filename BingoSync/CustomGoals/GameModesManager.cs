@@ -169,7 +169,7 @@ namespace BingoSync.CustomGoals
 
         public static void RegisterGoalsForCustom(string groupName, Dictionary<string, BingoGoal> goals)
         {
-            goalGroupDefinitions[groupName] = goals.Values.ToList();
+            goalGroupDefinitions[groupName] = [.. goals.Values];
         }
 
         internal static List<BingoGoal> GetGoalsFromNames(string groupName, List<string> goalNames)
@@ -199,7 +199,7 @@ namespace BingoSync.CustomGoals
                 Log($"Couldn't create default settings for unknown group \"{groupName}\"");
                 return new GoalGroup("Unknown Group", []);
             }
-            return new GoalGroup(groupName, goalGroupDefinitions[groupName].Select(goal => goal.name).ToList());
+            return new GoalGroup(groupName, [.. goalGroupDefinitions[groupName].Select(goal => goal.name)]);
         }
 
         public static bool GoalGroupExists(string groupName)
@@ -223,12 +223,12 @@ namespace BingoSync.CustomGoals
             string lockoutString = Controller.MenuIsLockout ? "lockout" : "non-lockout";
             string isCustomSeedString = isCustomSeed ? "set" : "random";
             Controller.ActiveSession.SendChatMessage($"Generating {Anify(Controller.ActiveGameMode)} board in {lockoutString} mode with {isCustomSeedString} seed {seed}");
-            string customJSON = GameMode.GetErrorBoard();
+            List<BingoGoal> board = GameMode.GetErrorBoard();
             if (Controller.ActiveGameMode != string.Empty)
             {
-                customJSON = FindGameModeByDisplayName(Controller.ActiveGameMode).GenerateBoard(seed);
+                board = FindGameModeByDisplayName(Controller.ActiveGameMode).GenerateBoard(seed);
             }
-            Controller.ActiveSession.NewCard(customJSON, Controller.MenuIsLockout);
+            Controller.ActiveSession.NewCard(board, Controller.MenuIsLockout);
         }
 
         private static void SetupVanillaGoals()

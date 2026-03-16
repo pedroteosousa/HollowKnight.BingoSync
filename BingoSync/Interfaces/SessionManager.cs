@@ -1,6 +1,5 @@
 ﻿using BingoSync.Clients;
 using BingoSync.Sessions;
-using Modding;
 using System;
 using System.Collections.Generic;
 
@@ -15,10 +14,6 @@ namespace BingoSync.Interfaces
             get
             {
                 return NeedsSessionNameKeys.Count > 0;
-            }
-            private set
-            {
-                throw new InvalidOperationException("Cannot directly set SessionManager.ShowSessionName, use SessionManager.ShowBoardNameWithKey and SessionManager.HideBoardNameWithKey instead");
             }
         }
 
@@ -80,35 +75,22 @@ namespace BingoSync.Interfaces
 
         /// <summary>
         /// Creates a connection session for the given server. 
-        /// This can be done manually, e.g. to use a custom client, 
-        /// but the session needs to be manually signed up for automarking, 
-        /// using SessionManager.RegisterForAutomarking(Session)
+        /// This can be done manually, e.g. to use a custom client.
         /// </summary>
         /// <param name="name"></param>
         /// <param name="server"></param>
-        /// <param name="isMarking"></param>
+        /// <param name="isAutoMarking">Whether or not in-game events can mark goals. Marking goals manually with SelectSquare is always possible.</param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public static Session CreateSession(string name, Servers server, bool isMarking)
+        public static Session CreateSession(string name, Servers server, bool isAutoMarking)
         {
             IRemoteClient remoteClient = server switch
             {
                 Servers.BingoSync => new BingoSyncClient(Log),
                 _ => throw new NotImplementedException()
             };
-            Session session = new(name, remoteClient, isMarking);
-            ModHooks.HeroUpdateHook += delegate { BingoTracker.ProcessBingo(session); };
+            Session session = new(name, remoteClient, isAutoMarking);
             return session;
-        }
-
-        /// <summary>
-        /// Registers a session as capable of automarking. Not to be confused with
-        /// Session.isMarking.
-        /// </summary>
-        /// <param name="session"></param>
-        public static void RegisterForAutomarking(Session session)
-        {
-            ModHooks.HeroUpdateHook += delegate { BingoTracker.ProcessBingo(session); };
         }
 
         /// <summary>

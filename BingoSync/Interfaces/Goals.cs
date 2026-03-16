@@ -13,7 +13,7 @@ namespace BingoSync
         /// <returns></returns>
         public static Dictionary<string, BingoGoal> ProcessGoalsFile(string filepath)
         {
-            return BingoTracker.ProcessGoalsFile(filepath);
+            return GoalCompletionTracker.ProcessGoalsFile(filepath);
         }
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace BingoSync
         /// <returns></returns>
         public static Dictionary<string, BingoGoal> ProcessGoalsStream(Stream goalstream)
         {
-            return BingoTracker.ProcessGoalsStream(goalstream);
+            return GoalCompletionTracker.ProcessGoalsStream(goalstream);
         }
 
         /// <summary>

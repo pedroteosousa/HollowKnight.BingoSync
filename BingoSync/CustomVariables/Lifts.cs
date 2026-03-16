@@ -13,7 +13,7 @@
             for (int i = 0; i < liftRoomPrefixes.Length; i++) {
                 if (!scene.StartsWith(liftRoomPrefixes[i])) continue;
                 string variableName = $"usedLift{i + 1}";
-                BingoTracker.UpdateBoolean(variableName, true);
+                GoalCompletionTracker.UpdateBoolean(variableName, true);
             }
 
             return orig;

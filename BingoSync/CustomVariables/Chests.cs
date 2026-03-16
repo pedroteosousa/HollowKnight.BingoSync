@@ -15,7 +15,7 @@ namespace BingoSync.CustomVariables
             if (self == null || self.FsmName != fsmName || !hasOpenState) return;
             openState.AddCustomAction(() => {
                 string variableName = $"chestOpen_{GameManager.instance.GetSceneNameString()}";
-                BingoTracker.UpdateBoolean(variableName, true);
+                GoalCompletionTracker.UpdateBoolean(variableName, true);
             });
         }
     }

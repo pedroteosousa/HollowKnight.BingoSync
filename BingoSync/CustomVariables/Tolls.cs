@@ -14,8 +14,8 @@ namespace BingoSync.CustomVariables
             var isTollScene = Array.IndexOf(tollScenes, sceneName) >= 0;
             if (!isTollScene) return;
             if (sceneName == cityBenchTollSceneName && geo != cityBenchTollPrice) return;
-            var paidTolls = BingoTracker.GetInteger(variableName) + 1;
-            BingoTracker.UpdateInteger(variableName, paidTolls);
+            var paidTolls = GoalCompletionTracker.GetInteger(variableName) + 1;
+            GoalCompletionTracker.UpdateInteger(variableName, paidTolls);
         }
     }
 }

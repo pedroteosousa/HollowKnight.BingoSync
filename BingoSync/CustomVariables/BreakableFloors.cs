@@ -15,8 +15,8 @@ namespace BingoSync.CustomVariables
             bool hasBreakState = self.TryGetState(breakStateName, out FsmState breakState);
             if (self == null || self.FsmName != fsmName || self.gameObject == null || !hasBreakState) return;
             breakState.AddCustomAction(() => {
-                var floorsBroken = BingoTracker.GetInteger(variableName);
-                BingoTracker.UpdateInteger(variableName, floorsBroken + 1);
+                var floorsBroken = GoalCompletionTracker.GetInteger(variableName);
+                GoalCompletionTracker.UpdateInteger(variableName, floorsBroken + 1);
             });
         }
     }

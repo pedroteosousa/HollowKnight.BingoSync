@@ -23,7 +23,7 @@ namespace BingoSync.CustomVariables
             {
                 var trinketNum = self.FsmVariables.GetFsmInt("Trinket Num").Value;
                 var variableName = GetVariableName(trinketNum);
-                BingoTracker.UpdateBoolean(variableName, true);
+                GoalCompletionTracker.UpdateBoolean(variableName, true);
             });
         }
     }

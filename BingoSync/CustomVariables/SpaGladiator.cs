@@ -17,7 +17,7 @@ namespace BingoSync.CustomVariables
             if (self == null || self.FsmName != fsmName || !hasSplashedState) return;
             if (self.gameObject == null || self.gameObject.name != objectName) return;
             splashedState.AddCustomAction(() => {
-                BingoTracker.UpdateBoolean(variableName, true);
+                GoalCompletionTracker.UpdateBoolean(variableName, true);
             });
         }
     }

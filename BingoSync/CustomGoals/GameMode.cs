@@ -29,10 +29,10 @@ namespace BingoSync.CustomGoals
             name = newName;
         }
 
-        virtual public string GenerateBoard(int seed)
+        virtual public List<BingoGoal> GenerateBoard(int seed)
         {
             List<BingoGoal> board = [];
-            List<BingoGoal> availableGoals = new(goals.Values);
+            List<BingoGoal> availableGoals = [.. goals.Values];
             Random r = new(seed);
             while (board.Count < 25)
             {
@@ -58,23 +58,18 @@ namespace BingoSync.CustomGoals
                 availableGoals.Remove(proposedGoal);
             }
 
-            return Jsonify(board);
+            return board;
         }
 
-        public static string Jsonify(List<BingoGoal> board)
+        public static List<BingoGoal> GetErrorBoard()
         {
-            string output = "[";
-            for (int i = 0; i < board.Count; i++)
+            BingoGoal empty = new("-");
+            List<BingoGoal> board = [new BingoGoal("Error generating board")];
+            for(int i = 0; i < 24; ++i)
             {
-                output += "{\"name\": \"" + board.ElementAt(i).name + "\"}" + (i < 24 ? "," : "");
+                board.Add(empty);
             }
-            output += "]";
-            return output;
-        }
-
-        public static string GetErrorBoard()
-        {
-            return "[{\"name\": \"Error generating board\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"},{\"name\": \"-\"}]";
+            return board;
         }
     }
 }

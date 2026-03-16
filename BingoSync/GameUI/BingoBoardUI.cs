@@ -70,30 +70,42 @@ namespace BingoSync.GameUI
             commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.CycleBoardOpacity, Controller.CycleBoardOpacity);
         }
 
+        public static void UpdateColorScheme()
+        {
+            board.UpdateColorScheme();
+        }
+
         public static void UpdateGrid()
         {
-            loadingText.Visibility = (!Controller.ActiveSession.Board.IsAvailable() && Controller.ActiveSession.ClientIsConnecting()) ? Visibility.Visible : Visibility.Hidden;
-            revealCardButton.Visibility = (Controller.ActiveSession.ClientIsConnected() && Controller.ActiveSession.Board.IsAvailable() && !Controller.ActiveSession.Board.IsRevealed) ? Visibility.Visible : Visibility.Hidden;
+            loadingText.Visibility = (!Controller.ActiveSession.Board.IsAvailable && Controller.ActiveSession.ClientIsConnecting()) ? Visibility.Visible : Visibility.Hidden;
+            revealCardButton.Visibility = (Controller.ActiveSession.ClientIsConnected() && Controller.ActiveSession.Board.IsAvailable && !Controller.ActiveSession.Board.IsRevealed) ? Visibility.Visible : Visibility.Hidden;
 
-            if (!Controller.ActiveSession.Board.IsAvailable())
+            if (!Controller.ActiveSession.Board.IsAvailable)
             {
                 return;
             }
 
-            foreach (Square square in Controller.ActiveSession.Board)
+            int goalIndex = 0;
+            foreach (Square square in Controller.ActiveSession.Board.SquaresToDisplay)
             {
-                board.bingoLayout[square.GoalNr].Text.Text = square.Name;
-                board.bingoLayout[square.GoalNr].BackgroundColors.Values.ToList().ForEach(img => img.Height = 0);
+                board.bingoLayout[goalIndex].Text.Text = square.Name;
+                board.bingoLayout[goalIndex].BackgroundColors.Values.ToList().ForEach(img => img.Height = 0);
+                board.bingoLayout[goalIndex].ColorsIcons.Values.ToList().ForEach(img => img.Visibility = Visibility.Hidden);
                 foreach (Colors color in square.MarkedBy)
                 {
-                    board.bingoLayout[square.GoalNr].BackgroundColors[color.GetName()].Height = 110 / square.MarkedBy.Count;
+                    board.bingoLayout[goalIndex].BackgroundColors[color.GetName()].Height = 110 / square.MarkedBy.Count;
+                    if (Controller.GlobalSettings.UseShapesForColors && color != Colors.Blank)
+                    {
+                        board.bingoLayout[goalIndex].ColorsIcons[color.GetName()].Visibility = Visibility.Visible;
+                    }
                 }
-                foreach(KeyValuePair<HighlightType, Image> entry in board.bingoLayout[square.GoalNr].Highlights)
+                foreach(KeyValuePair<HighlightType, Image> entry in board.bingoLayout[goalIndex].Highlights)
                 {
                     HighlightType sprite = entry.Key;
                     Image image = entry.Value;
-                    image.Height = sprite == Controller.GlobalSettings.SelectedHighlightSprite && square.Highlighted ? 110 : 0;
+                    image.Visibility = sprite == Controller.GlobalSettings.SelectedHighlightSprite && square.Highlighted ? Visibility.Visible : Visibility.Hidden;
                 }
+                ++goalIndex;
             }
         }
 

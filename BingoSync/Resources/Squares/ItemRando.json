@@ -4476,7 +4476,7 @@
         "name": "Talk to Salubra while overcharmed",
         "condition": {
             "type": "Bool",
-            "variableName": "salubraConvoOvercharm",
+            "variableName": "talkedToSalubraOvercharmed",
             "expectedValue": true
         }
     },

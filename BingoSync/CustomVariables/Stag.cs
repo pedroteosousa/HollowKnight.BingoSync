@@ -19,7 +19,7 @@ namespace BingoSync.CustomVariables
                 var targetPos = self.FsmVariables.GetVariable("To Position");
                 if (targetPos == null) return;
                 string variableName = $"stagTravelTo_{targetPos.ToInt()}";
-                BingoTracker.UpdateBoolean(variableName, true);
+                GoalCompletionTracker.UpdateBoolean(variableName, true);
             });
         }
     }

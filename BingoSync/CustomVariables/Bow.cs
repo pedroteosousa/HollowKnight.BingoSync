@@ -32,7 +32,7 @@ namespace BingoSync.CustomVariables
                 if (GameManager.instance.GetSceneNameString() != info.roomName) return;
                 if (!info.BowRect.Contains(pos)) return;
                 var variableName = $"bow{info.variableSuffix}";
-                BingoTracker.UpdateBoolean(variableName, true);
+                GoalCompletionTracker.UpdateBoolean(variableName, true);
             });
         }
     }

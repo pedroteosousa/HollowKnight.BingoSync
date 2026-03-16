@@ -11,7 +11,7 @@
                 return orig;
 
             var equippedCharms = PlayerData.instance.equippedCharms.Count;
-            BingoTracker.UpdateInteger(variableName, equippedCharms);
+            GoalCompletionTracker.UpdateInteger(variableName, equippedCharms);
 
             return orig;
         }

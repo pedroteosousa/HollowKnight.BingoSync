@@ -22,7 +22,7 @@ namespace BingoSync.CustomGoals
             }
         }
         [JsonProperty("GoalGroups")]
-        private List<GoalGroup> goalSettings;
+        private readonly List<GoalGroup> goalSettings;
 
         public CustomGameMode(string name, Dictionary<string, BingoGoal> goals, List<GoalGroup> loadedGoalSettings = null) 
             : base(name, goals)
@@ -74,7 +74,7 @@ namespace BingoSync.CustomGoals
             SetGoals(goals);
         }
 
-        public override string GenerateBoard(int seed)
+        public override List<BingoGoal> GenerateBoard(int seed)
         {
             SetGoalsFromSettings();
             return base.GenerateBoard(seed);

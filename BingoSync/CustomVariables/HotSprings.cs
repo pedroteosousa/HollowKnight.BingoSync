@@ -19,7 +19,7 @@ namespace BingoSync.CustomVariables
             }
             var zone = ZoneHelper.GreaterZone(GameManager.instance.sm.mapZone);
             var variableName = GetHotSpringVariableName(zone);
-            BingoTracker.UpdateBoolean(variableName, true);
+            GoalCompletionTracker.UpdateBoolean(variableName, true);
             return orig;
         }
 

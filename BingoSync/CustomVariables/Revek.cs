@@ -1,6 +1,5 @@
 ﻿using Satchel;
 using System.Collections;
-using System.Linq;
 using UnityEngine;
 
 namespace BingoSync.CustomVariables
@@ -12,7 +11,7 @@ namespace BingoSync.CustomVariables
 
         public static IEnumerator EnterRoom(On.HeroController.orig_EnterScene orig, HeroController self, TransitionPoint enterGate, float delayBeforeEnter)
         {
-            BingoTracker.UpdateInteger(variableName, 0);
+            GoalCompletionTracker.UpdateInteger(variableName, 0);
             return orig(self, enterGate, delayBeforeEnter);
         }
 
@@ -44,8 +43,8 @@ namespace BingoSync.CustomVariables
                 }
             }
 
-            var consecutiveParries = BingoTracker.GetInteger(variableName) + 1;
-            BingoTracker.UpdateInteger(variableName, consecutiveParries);
+            var consecutiveParries = GoalCompletionTracker.GetInteger(variableName) + 1;
+            GoalCompletionTracker.UpdateInteger(variableName, consecutiveParries);
         }
     }
 }

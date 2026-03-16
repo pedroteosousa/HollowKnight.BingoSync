@@ -17,7 +17,7 @@ namespace BingoSync.CustomVariables
             if (self == null || self.FsmName != fsmName || !hasPoolEnterState) return;
             if (self.gameObject == null || !self.gameObject.scene.name.StartsWith(sceneNamePrefix)) return;
             poolEnterState.AddCustomAction(() => {
-                BingoTracker.UpdateBoolean(variableName, true);
+                GoalCompletionTracker.UpdateBoolean(variableName, true);
             });
         }
     }

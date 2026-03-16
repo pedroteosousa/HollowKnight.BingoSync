@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BingoSync.CustomVariables
+﻿namespace BingoSync.CustomVariables
 {
     internal class FountainFragment
     {
@@ -17,7 +10,7 @@ namespace BingoSync.CustomVariables
         {
             if (name == fragmentVariableName && GameManager.instance.GetSceneNameString() == fountainSceneName)
             {
-                BingoTracker.UpdateBoolean(variableName, true);
+                GoalCompletionTracker.UpdateBoolean(variableName, true);
             }
             return orig;
         }

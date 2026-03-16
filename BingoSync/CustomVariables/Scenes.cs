@@ -22,16 +22,16 @@ namespace BingoSync.CustomVariables
             CheckIfInLifebloodCoreRoom(room);
 
             string zoneVisitedVariableName = $"zoneVisited_{zone}";
-            BingoTracker.UpdateBoolean(zoneVisitedVariableName, true);
+            GoalCompletionTracker.UpdateBoolean(zoneVisitedVariableName, true);
             string roomVisitedVariableName = $"roomVisited_{room}";
-            BingoTracker.UpdateBoolean(roomVisitedVariableName, true);
+            GoalCompletionTracker.UpdateBoolean(roomVisitedVariableName, true);
             return orig(self, enterGate, delayBeforeEnter);
         }
 
         public static void CheckIfInLifebloodCoreRoom(string roomName)
         {
             var variableName = "inLifebloodCoreRoom";
-            BingoTracker.UpdateBoolean(variableName, roomName == lifebloodCoreRoomName);
+            GoalCompletionTracker.UpdateBoolean(variableName, roomName == lifebloodCoreRoomName);
         }
     }
 }

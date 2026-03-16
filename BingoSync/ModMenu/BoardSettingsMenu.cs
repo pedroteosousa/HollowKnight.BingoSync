@@ -1,7 +1,7 @@
-﻿using Satchel.BetterMenus;
+﻿using BingoSync.GameUI;
+using Satchel.BetterMenus;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using static BingoSync.Settings.ModSettings;
 
 namespace BingoSync.ModMenu
@@ -14,7 +14,8 @@ namespace BingoSync.ModMenu
         public static MenuScreen CreateMenuScreen(MenuScreen parentMenu)
         {
             int alphaCount = Controller.GlobalSettings.BoardAlphas.Count;
-            int elementCount = alphaCount + 1;
+            // Alphas, Highlight Type, Notif Condition, Notif Clip, Notif Volume
+            int elementCount = alphaCount + 4;
             Element[] elements = new Element[elementCount];
 
             int elementId = 0;
@@ -45,6 +46,47 @@ namespace BingoSync.ModMenu
                 elements[elementId] = _Sliders[i];
                 ++elementId;
             }
+
+            elements[elementId] = new HorizontalOption(
+                name: "Audio For",
+                description: "When to play the selected sound",
+                values: ["None", "Other Players", "Other Colors", "All Goals"],
+                applySetting: (index) =>
+                {
+                    Controller.GlobalSettings.AudioNotificationOn = (AudioNotificationCondition)index;
+                    Controller.DefaultSession.AudioNotificationOn = (AudioNotificationCondition)index;
+                    Controller.BoardUpdate();
+                },
+                loadSetting: () => (int)Controller.GlobalSettings.AudioNotificationOn
+            );
+            ++elementId;
+
+            elements[elementId] = new HorizontalOption(
+                name: "Audio Clip",
+                description: "What sound to play when a goal gets marked",
+                values: Controller.Audio.ClipNames.ToArray(),
+                applySetting: (index) =>
+                {
+                    Controller.GlobalSettings.AudioClipId = index;
+                    Controller.Audio.Play(index);
+                    Controller.BoardUpdate();
+                },
+                loadSetting: () => Controller.GlobalSettings.AudioClipId
+            );
+            ++elementId;
+
+            elements[elementId] = new CustomSlider(
+                name: "Audio Volume",
+                storeValue: value => Controller.GlobalSettings.AudioClipVolume = value,
+                loadValue: () =>
+                {
+                    return Controller.GlobalSettings.AudioClipVolume;
+                },
+                minValue: 0f,
+                maxValue: 3f
+            );
+            ++elementId;
+
             _BoardSettingsMenu = new Menu("BingoSync", elements);
             // do not call RefreshMenu here, Menu.Update does not work before Menu.GetMenuScreen is called first
             for (int i = 0; i < _Sliders.Count; ++i)

@@ -23,8 +23,8 @@ namespace BingoSync.CustomVariables
         {
             zone = ZoneHelper.GreaterZone(zone);
             var variableName = GetZoneGrubsVariableName(zone);
-            var grubsSaveOnZone = BingoTracker.GetInteger(variableName) + 1;
-            BingoTracker.UpdateInteger(variableName, grubsSaveOnZone);
+            var grubsSaveOnZone = GoalCompletionTracker.GetInteger(variableName) + 1;
+            GoalCompletionTracker.UpdateInteger(variableName, grubsSaveOnZone);
         }
     }
 }

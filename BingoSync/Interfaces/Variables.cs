@@ -38,7 +38,7 @@ namespace BingoSync
         /// <returns></returns>
         public static int GetInteger(string variableName)
         {
-            int value = BingoTracker.GetInteger(variableName);
+            int value = GoalCompletionTracker.GetInteger(variableName);
             if (trackedVariables.Contains(variableName))
             {
                 Log($"GetInteger: {variableName} = {value}");
@@ -58,7 +58,7 @@ namespace BingoSync
             {
                 Log($"UpdateInteger: {variableName} = {value}");
             }
-            BingoTracker.UpdateInteger(variableName, value);
+            GoalCompletionTracker.UpdateInteger(variableName, value);
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace BingoSync
         /// <returns></returns>
         public static bool GetBoolean(string variableName)
         {
-            bool value = BingoTracker.GetBoolean(variableName);
+            bool value = GoalCompletionTracker.GetBoolean(variableName);
             if (trackedVariables.Contains(variableName))
             {
                 Log($"GetBoolean: {variableName} = {value}");
@@ -107,7 +107,7 @@ namespace BingoSync
             {
                 Log($"UpdateBoolean: {variableName} = {value}");
             }
-            BingoTracker.UpdateBoolean(variableName, value);
+            GoalCompletionTracker.UpdateBoolean(variableName, value);
         }
 
         /// <summary>

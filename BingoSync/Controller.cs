@@ -1,23 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using MagicUI.Elements;
-using System.Threading;
-using BingoSync.ModMenu;
-using BingoSync.Settings;
+﻿using BingoSync.Clients;
 using BingoSync.CustomGoals;
 using BingoSync.GameUI;
-using System.Linq;
-using BingoSync.Clients;
-using BingoSync.Sessions;
 using BingoSync.Interfaces;
+using BingoSync.ModMenu;
+using BingoSync.Sessions;
+using BingoSync.Settings;
+using MagicUI.Elements;
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BingoSync
 {
     internal static class Controller
     {
         public static ModSettings GlobalSettings { get; set; } = new ModSettings();
+
+        public static AudioPlayer Audio { get; set; } = new AudioPlayer();
 
         public static Session DefaultSession { get; set; }
         private static Session _activeSession;
@@ -147,7 +148,10 @@ namespace BingoSync
         public static void Setup(Action<string> log)
         {
             Log = log;
-            DefaultSession = new Session("Default", new BingoSyncClient(log), true);
+            DefaultSession = new Session("Default", new BingoSyncClient(log), true)
+            {
+                AudioNotificationOn = GlobalSettings.AudioNotificationOn
+            };
             ActiveSession = DefaultSession;
             OnBoardUpdate += BingoBoardUI.UpdateGrid;
             OnBoardUpdate += BingoBoardUI.UpdateName;
@@ -180,7 +184,7 @@ namespace BingoSync
 
         public static void ToggleBoardKeybindClicked()
         {
-            if (!ActiveSession.Board.IsAvailable())
+            if (!ActiveSession.Board.IsAvailable)
             {
                 return;
             }
@@ -222,12 +226,12 @@ namespace BingoSync
             {
                 return;
             }
-            if (!ActiveSession.Board.IsAvailable() || !ActiveSession.Board.IsRevealed || ActiveSession.Board.IsConfirmed)
+            if (!ActiveSession.Board.IsAvailable || !ActiveSession.Board.IsRevealed || ActiveSession.Board.IsConfirmed)
             {
                 return;
             }
             ActiveSession.Board.IsConfirmed = true;
-            string message = $"Revealed my card in hand-mode, my top-left goal is \"{ActiveSession.Board.GetSlot(0).Name}\"";
+            string message = $"Revealed my card in hand-mode, my top-left goal is \"{ActiveSession.Board.GetIndex(0).Name}\"";
             ActiveSession.SendChatMessage(message);
         }
 
@@ -238,7 +242,7 @@ namespace BingoSync
 
         public static void CycleBoardOpacity()
         {
-            if (!ActiveSession.Board.IsAvailable())
+            if (!ActiveSession.Board.IsAvailable)
             {
                 return;
             }
@@ -331,69 +335,8 @@ namespace BingoSync
             GenerationMenuUI.SetupGameModeButtons();
         }
 
-        public static void AfterGoalPacksLoaded()
-        {
-            GameModesManager.RefreshCustomGameModes();
-            MenuUI.SetupGameModeButtons();
-        }
-
         public static void DumpDebugInfo()
         {
-            Log("----------------------------------------------------------------");
-            Log("-------------------                          -------------------");
-            Log("-------------------   BingoSync Debug Dump   -------------------");
-            Log("-------------------                          -------------------");
-            Log("----------------------------------------------------------------");
-            /*
-            Log("Controller");
-            Log($"\tBoard");
-            foreach (string goalname in ActiveSession.Board.Select(square => square.Name))
-            {
-                Log($"\t\tGoal \"{goalname}\"");
-            };
-            Log($"\tMenuIsVisible = {MenuIsVisible}");
-            Log($"\tBoardIsVisible = {BoardIsVisible}");
-            Log($"\tBoardIsConfirmed = {ActiveSession.Board.IsConfirmed}");
-            Log($"\tBoardIsRevealed = {ActiveSession.Board.IsRevealed}");
-            Log($"\tActiveGameMode = {ActiveGameMode}");
-            Log($"\tRoomCode = {RoomCode}");
-            Log($"\tRoomPassword = {RoomPassword}");
-            Log($"\tRoomNickname = {RoomNickname}");
-            Log($"\tRoomColor = {RoomColor}");
-            Log($"\tRoomIsLockout = {ActiveSession.RoomIsLockout}");
-
-
-            ActiveSession.DumpDebugInfo();
-
-            GameModesManager.DumpDebugInfo();
-
-            Log($"GlobalSettings");
-            Log($"\tBoardAlphaIndex = {GlobalSettings.BoardAlphaIndex}");
-            Log($"\tRevealCardOnGameStart = {GlobalSettings.RevealCardOnGameStart}");
-            Log($"\tRevealCardWhenOthersReveal = {GlobalSettings.RevealCardWhenOthersReveal}");
-            Log($"\tUnmarkGoals = {GlobalSettings.UnmarkGoals}");
-            Log($"\tDefaultNickname = {GlobalSettings.DefaultNickname}");
-            Log($"\tDefaultPassword = {GlobalSettings.DefaultPassword}");
-            Log($"\tDefaultColor = {GlobalSettings.DefaultColor}");
-            foreach (string gamemode in GlobalSettings.CustomGameModes.Select(gameMode => gameMode.GetDisplayName()))
-            {
-                Log($"\tCustomGameMode \"{gamemode}\"");
-            }
-            
-            Log($"\tActiveSession.GetClientState() = {ActiveSession.GetClientState()}");
-
-            ActiveSession.ProcessRoomHistory(history => {
-                var stringBuilder = new StringBuilder();
-                var serializer = new JsonSerializer();
-                serializer.Serialize(new IndentedTextWriter(new StringWriter(stringBuilder)), history);
-                Log(stringBuilder.ToString());
-            }, () => { });
-            */
-
-            Log("Controller.HandMode: " + HandMode.ToString());
-            Log("MenuUI.HandMode: " + MenuUI.HandMode.ToString());
-            Log("ConnectionMenuUI.HandMode: " + ConnectionMenuUI.HandMode.ToString());
-            Log("ActiveSession.HandMode: " + ActiveSession.HandMode.ToString());
         }
 
         public static bool RenameActiveGameModeTo(string newName)
@@ -424,21 +367,14 @@ namespace BingoSync
 
         public static void RefreshGenerationButtonEnabled()
         {
-            SetGenerationButtonEnabled((ActiveSession.ClientIsConnected() || ActiveSession.ClientIsConnecting()) && IsOnMainMenu);
+            bool clientConnected = (ActiveSession.ClientIsConnected() || ActiveSession.ClientIsConnecting());
+            bool standardGeneration = !ActiveSession.NonStandardBoardGeneration;
+            SetGenerationButtonEnabled(clientConnected && IsOnMainMenu && standardGeneration);
         }
 
         public static void RefreshMenu()
         {
             MainMenu.RefreshMenu();
-        }
-
-        internal static void MoveGameModesFromSettings()
-        {
-            foreach (CustomGameMode gameMode in GlobalSettings.CustomGameModes)
-            {
-                GameModesManager.CustomGameModes.Add(gameMode);
-            }
-            GlobalSettings.CustomGameModes.Clear();
         }
     }
 }

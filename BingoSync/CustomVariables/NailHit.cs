@@ -20,7 +20,7 @@ namespace BingoSync.CustomVariables
             {
                 if (otherCollider.gameObject == null || otherCollider.gameObject.name != target.objectName) return;
                 var variableName = $"nailHit{target.variableSuffix}";
-                BingoTracker.UpdateBoolean(variableName, true);
+                GoalCompletionTracker.UpdateBoolean(variableName, true);
             });
         }
     }

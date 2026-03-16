@@ -22,7 +22,7 @@
 
         private static void MarkTramVisited(string scene, int location) {
             var variableName = $"visited_{scene}_{location}";
-            BingoTracker.UpdateBoolean(variableName, true);
+            GoalCompletionTracker.UpdateBoolean(variableName, true);
         }
     }
 }

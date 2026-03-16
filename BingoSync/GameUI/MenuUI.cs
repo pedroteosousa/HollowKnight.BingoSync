@@ -44,7 +44,7 @@ namespace BingoSync.GameUI
             Log = log;
 
             ConnectionMenuUI.Setup(Log, layoutRoot);
-            GenerationMenuUI.Setup(Log, layoutRoot);
+            GenerationMenuUI.Setup(Log);
 
 
             layoutRoot.VisibilityCondition = () => {

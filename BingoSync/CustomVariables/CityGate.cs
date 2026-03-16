@@ -18,7 +18,7 @@ namespace BingoSync.CustomVariables
             if (self == null || self.FsmName != fsmName || !hasOpenState) return;
             if (self.gameObject == null || self.gameObject.name != objectName) return;
             openState.AddCustomAction(() => {
-                BingoTracker.UpdateBoolean(variableName, true);
+                GoalCompletionTracker.UpdateBoolean(variableName, true);
             });
         }
     }

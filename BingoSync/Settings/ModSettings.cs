@@ -2,6 +2,7 @@
 using Modding.Converters;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using BingoSync.GameUI;
 
 namespace BingoSync.Settings
 {
@@ -12,6 +13,12 @@ namespace BingoSync.Settings
             Border,
             Star,
         }
+        public enum ItemSyncMarkDelay
+        {
+            None = 0,
+            Delay = 1,
+            NoMark = 2,
+        }
 
         [JsonConverter(typeof(PlayerActionSetConverter))]
         public KeyBinds Keybinds = new();
@@ -21,8 +28,8 @@ namespace BingoSync.Settings
         public string DefaultNickname = "";
         public string DefaultPassword = "";
         public string DefaultColor = "red";
-        public List<CustomGameMode> CustomGameModes = [];
         public bool DebugMode = false;
+
         public int BoardAlphaIndex = 0;
         public List<float> BoardAlphas = [0.135f, 0.5f, 1f];
         public float BoardAlpha {
@@ -33,5 +40,19 @@ namespace BingoSync.Settings
             set {}
         }
         public HighlightType SelectedHighlightSprite = HighlightType.Border;
+
+        public AudioNotificationCondition AudioNotificationOn = AudioNotificationCondition.None;
+        public int AudioClipId = 0;
+        public float AudioClipVolume = 1.0f;
+
+        public int ColorScheme = 0;
+        public bool UseShapesForColors = false;
+        public bool AdaptIconOpcaity = false;
+
+        public ItemSyncMarkDelay ItemSyncMarkSetting = ItemSyncMarkDelay.Delay;
+        public int ItemSyncMarkDelayMilliseconds = 1000;
+
+        public bool MarkCompletedGoalsOnLoadSavefile = true;
+        public bool MarkCompletedGoalsOnNewCardReceived = true;
     }
 }

@@ -22,7 +22,7 @@ namespace BingoSync.CustomVariables
                 var controlFsm = self.gameObject.LocateMyFSM(controlFsmName);
                 if (controlFsm == null) return;
                 var killCount = controlFsm.FsmVariables.GetFsmInt(fsmVariableName).Value;
-                BingoTracker.UpdateInteger(variableName, killCount);
+                GoalCompletionTracker.UpdateInteger(variableName, killCount);
             });
         }
     }

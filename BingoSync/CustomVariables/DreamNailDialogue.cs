@@ -15,7 +15,7 @@ namespace BingoSync.CustomVariables
             if (self == null || self.FsmName != fsmName || self.gameObject == null || !hasHitState) return;
             hitState.AddCustomAction(() => {
                 string variableName = $"dreamDialogue_{self.gameObject.scene.name}_{self.gameObject.name}";
-                BingoTracker.UpdateBoolean(variableName, true);
+                GoalCompletionTracker.UpdateBoolean(variableName, true);
             });
         }
     }

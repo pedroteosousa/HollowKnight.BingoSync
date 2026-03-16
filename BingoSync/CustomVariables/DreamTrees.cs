@@ -18,11 +18,11 @@ namespace BingoSync.CustomVariables
                 cursor.GotoNext();
                 cursor.EmitDelegate<Action>(() =>
                 {
-                    var dreamTreesCompleted = BingoTracker.GetInteger(variableName);
-                    BingoTracker.UpdateInteger(variableName, dreamTreesCompleted + 1);
+                    var dreamTreesCompleted = GoalCompletionTracker.GetInteger(variableName);
+                    GoalCompletionTracker.UpdateInteger(variableName, dreamTreesCompleted + 1);
                     var zone = ZoneHelper.GreaterZone(GameManager.instance.sm.mapZone);
                     string regionVariableName = $"dreamTreeCompleted_{zone}";
-                    BingoTracker.UpdateBoolean(regionVariableName, true);
+                    GoalCompletionTracker.UpdateBoolean(regionVariableName, true);
                 });
             }
         }

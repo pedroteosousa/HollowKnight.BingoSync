@@ -11,7 +11,7 @@ namespace BingoSync.CustomVariables
             orig(self);
             if (self == null || self.gameObject == null || !nailArtObjectNames.Contains(self.gameObject.name)) return;
             var variableName = $"nailArtUsed_{self.gameObject.name}_{GameManager.instance.GetSceneNameString()}";
-            BingoTracker.UpdateBoolean(variableName, true);
+            GoalCompletionTracker.UpdateBoolean(variableName, true);
         }
     }
 }

@@ -18,12 +18,12 @@ namespace BingoSync.CustomVariables
             if (self.gameObject == null || !self.gameObject.name.StartsWith(objectName)) return;
             hitState.AddCustomAction(() => {
                 string uniqueVariableName = $"hitShadeGate_{self.gameObject.scene.name}_{self.gameObject.GetPath()}";
-                var alreadyHit = BingoTracker.GetBoolean(uniqueVariableName);
+                var alreadyHit = GoalCompletionTracker.GetBoolean(uniqueVariableName);
                 if (alreadyHit)
                     return;
-                BingoTracker.UpdateBoolean(uniqueVariableName, true);
-                var shadeGatesHit = BingoTracker.GetInteger(variableName) + 1;
-                BingoTracker.UpdateInteger(variableName, shadeGatesHit);
+                GoalCompletionTracker.UpdateBoolean(uniqueVariableName, true);
+                var shadeGatesHit = GoalCompletionTracker.GetInteger(variableName) + 1;
+                GoalCompletionTracker.UpdateInteger(variableName, shadeGatesHit);
             });
         }
     }

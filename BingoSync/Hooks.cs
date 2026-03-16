@@ -15,9 +15,6 @@ namespace BingoSync
     {
         public static void Setup()
         {
-            // Check bingo objectives every frame
-            ModHooks.HeroUpdateHook += HeroUpdate;
-
             // General
             ModHooks.SetPlayerBoolHook += UpdateBoolInternal;
             ModHooks.SetPlayerIntHook += UpdateIntInternal;
@@ -157,21 +154,16 @@ namespace BingoSync
 
         }
 
-        private static void HeroUpdate()
-        {
-            BingoTracker.ProcessBingo(Controller.ActiveSession);
-        }
-
         private static bool UpdateBoolInternal(string name, bool orig)
         {
-            BingoTracker.UpdateBoolean(name, orig);
+            GoalCompletionTracker.UpdateBoolean(name, orig);
             return orig;
         }
 
         private static int UpdateIntInternal(string name, int current)
         {
             var previous = PlayerData.instance.GetIntInternal(name);
-            BingoTracker.UpdateInteger(name, previous, current);
+            GoalCompletionTracker.UpdateInteger(name, previous, current);
             return current;
         }
 

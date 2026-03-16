@@ -21,7 +21,19 @@ namespace BingoSync.GameUI
         private static TextInput profileNameInput;
         private static Button acceptProfileNameButton;
         private static int currentProfileScreen = 0;
-        private static readonly int profilesPerScreen = 15;
+        private static int _profilesPerScreen = 15;
+        public static bool BottomBarShown
+        {
+            get
+            {
+                return _profilesPerScreen == 15;
+            }
+            set
+            {
+                _profilesPerScreen = value ? 12 : 15;
+                Controller.RegenerateGameModeButtons();
+            }
+        }
         private static Button previousProfileButton;
         private static Button nextProfileButton;
 
@@ -32,26 +44,36 @@ namespace BingoSync.GameUI
 
         public static bool TextBoxActive { get; private set; } = false;
 
-        public static void Setup(Action<string> log, LayoutRoot layoutRoot)
+        public static void Setup(Action<string> log)
         {
             Log = log;
             Loader.Preload();
-            GenerationMenuUI.layoutRoot = layoutRoot;
+            SharedUIPage page = SharedUIManager.RequestUIPage("BingoSync");
+            layoutRoot = page.Root;
             CreateGenerationMenu();
+            page.AddContent(generationMenu);
         }
 
         public static void CreateGenerationMenu()
         {
+            bool lockoutButtonIsLockout = lockoutToggleButton?.IsOn ?? false;
+
+            profileNameInput?.Destroy();
+            acceptProfileNameButton?.Destroy();
+            generationSeedInput?.Destroy();
+            generateBoardButton?.Destroy();
+            lockoutToggleButton?.Destroy();
+
             generationMenu?.Children.Clear();
 
-            generationMenu = new(layoutRoot)
-            {
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment = VerticalAlignment.Bottom,
-                Spacing = 15,
-                Orientation = Orientation.Vertical,
-                Padding = new Padding(0, 50, 20, 15),
-            };
+            generationMenu ??= new(layoutRoot)
+                {
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    Spacing = 15,
+                    Orientation = Orientation.Vertical,
+                    Padding = new Padding(0, 50, 20, 15),
+                };
 
             profileNameInput = new(layoutRoot, "profileName")
             {
@@ -98,6 +120,11 @@ namespace BingoSync.GameUI
                 MinHeight = MenuUI.lockoutButtonWidth,
             };
             lockoutToggleButton.SetButton(lockoutButton);
+
+            if (lockoutButtonIsLockout)
+            {
+                lockoutToggleButton.Toggle(lockoutButton);
+            }
 
             SetupRenameProfileRow();
             SetupGenerateRow();
@@ -211,8 +238,8 @@ namespace BingoSync.GameUI
             gameModeButtons.Clear();
 
             List<string> gameModes = GameModesManager.GameModeNames();
-            int gameModeCountOnScreen = Math.Min(profilesPerScreen, gameModes.Count - currentProfileScreen*profilesPerScreen);
-            List<string> gameModesOnScreen = gameModes.GetRange(currentProfileScreen * profilesPerScreen, gameModeCountOnScreen);
+            int gameModeCountOnScreen = Math.Min(_profilesPerScreen, gameModes.Count - currentProfileScreen*_profilesPerScreen);
+            List<string> gameModesOnScreen = gameModes.GetRange(currentProfileScreen * _profilesPerScreen, gameModeCountOnScreen);
 
             foreach (string gameMode in gameModesOnScreen)
             {
@@ -327,7 +354,7 @@ namespace BingoSync.GameUI
         private static void NextProfileButtonClicked(Button _)
         {
             int profilesCount = GameModesManager.GameModeNames().Count;
-            if (currentProfileScreen < (profilesCount / profilesPerScreen)) ++currentProfileScreen;
+            if (currentProfileScreen < (profilesCount / _profilesPerScreen)) ++currentProfileScreen;
             Controller.RegenerateGameModeButtons();
         }
 
@@ -335,8 +362,8 @@ namespace BingoSync.GameUI
         {
             int profilesCount = GameModesManager.GameModeNames().Count;
             previousProfileButton.Enabled = (currentProfileScreen > 0);
-            nextProfileButton.Enabled = (profilesCount > profilesPerScreen * (currentProfileScreen+1));
-            while(profilesCount < profilesPerScreen * currentProfileScreen + 1)
+            nextProfileButton.Enabled = (profilesCount > _profilesPerScreen * (currentProfileScreen+1));
+            while(profilesCount < _profilesPerScreen * currentProfileScreen + 1)
             {
                 --currentProfileScreen;
             }
