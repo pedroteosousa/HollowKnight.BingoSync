@@ -395,7 +395,7 @@ namespace BingoSync.Sessions
                     break;
 
                 case AudioNotificationCondition.OtherPlayers:
-                    if(goalUpdate.Player.Name != RoomNickname)
+                    if(goalUpdate.Player.UUID != RoomPlayerUUID)
                     {
                         Controller.Audio.Play(ActiveAudioId);
                     }
