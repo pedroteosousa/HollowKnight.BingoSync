@@ -557,10 +557,7 @@ namespace BingoSync.Clients
                     readTask.ContinueWith(settingsResponse =>
                     {
                         var settings = JsonConvert.DeserializeObject<NetworkObjectRoomSettingsResponse>(settingsResponse.Result);
-                        RoomSettingsReceived(this, new RoomSettings()
-                        {
-                            IsLockout = settings.Settings.LockoutMode == LOCKOUT_MODE
-                        });
+                        RoomSettingsReceived?.Invoke(this, NetworkRoomSettingsToLocal(settings));
                     });
                 });
             }, maxRetries, nameof(UpdateSettings));
@@ -621,6 +618,20 @@ namespace BingoSync.Clients
         }
 
         #region Network objects to internal broadcast objects
+
+        private static RoomSettings NetworkRoomSettingsToLocal(NetworkObjectRoomSettingsResponse network)
+        {
+            return new RoomSettings()
+            {
+                HideCard = network.Settings.HideCard,
+                IsLockout = network.Settings.LockoutMode == LOCKOUT_MODE,
+                GameName = network.Settings.GameName,
+                GameId = network.Settings.GameId,
+                VariantName = network.Settings.VariantName,
+                VariantId = network.Settings.VariantId,
+                Seed = network.Settings.Seed,
+            };
+        }
 
         private static PlayerInfo NetworkPlayerBroadcastToLocal(NetworkObjectPlayer network)
         {
@@ -923,8 +934,20 @@ namespace BingoSync.Clients
     [DataContract]
     class NetworkObjectRoomSettings
     {
+        [JsonProperty("hide_card")]
+        public bool HideCard = true;
         [JsonProperty("lockout_mode")]
         public string LockoutMode = string.Empty;
+        [JsonProperty("game")]
+        public string GameName = string.Empty;
+        [JsonProperty("game_id")]
+        public int GameId = 0;
+        [JsonProperty("variant")]
+        public string VariantName = string.Empty;
+        [JsonProperty("variant_id")]
+        public int VariantId = 0;
+        [JsonProperty("seed")]
+        public int Seed = 0;
     }
 
     [DataContract]

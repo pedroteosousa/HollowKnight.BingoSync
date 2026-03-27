@@ -64,6 +64,7 @@ namespace BingoSync.Sessions
             }
         }
         public bool RoomIsLockout { get; set; } = false;
+        public bool RoomHidCardInitially { get; set; } = false;
         public string RoomLink { get; set; } = string.Empty;
         public string RoomNickname { get; set; } = string.Empty;
         public string RoomPassword { get; set; } = string.Empty;
@@ -186,6 +187,7 @@ namespace BingoSync.Sessions
         private void ConsumeRoomSettings(object sender, RoomSettings settings)
         {
             RoomIsLockout = settings.IsLockout;
+            RoomHidCardInitially = settings.HideCard;
         }
 
         private void MarkCompletedGoalsOnNewCard(object sender, NewCardEventInfo newCardEvent)
