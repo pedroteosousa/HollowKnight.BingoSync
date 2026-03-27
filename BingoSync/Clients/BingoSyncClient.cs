@@ -188,10 +188,12 @@ namespace BingoSync.Clients
                         var socketJoin = JsonConvert.DeserializeObject<NetworkObjectSocketJoinRequest>(joinRoomResponse.Result);
                         socketKey = socketJoin.SocketKey;
                         RequestPlayerUUID(() => { });
-                        ConnectToBroadcastSocket(socketJoin);
+                        ConnectToBroadcastSocket(socketJoin, () =>
+                        {
+                            SetColor(color);
+                        });
                         RequestAndSetBoard(true, () => { }); 
                         UpdateSettings();
-                        SetColor(color.GetName());
                     });
                 }
                 catch (Exception _ex)
@@ -207,12 +209,13 @@ namespace BingoSync.Clients
             });
         }
 
-        private void SetColor(string color)
+        public void SetColor(Colors color)
         {
+            if (GetState() != ClientState.Connected) return;
             var setColorInput = new NetworkObjectSetColorRequest
             {
                 Room = currentRoomID,
-                Color = color,
+                Color = color.GetName(),
             };
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
@@ -286,14 +289,14 @@ namespace BingoSync.Clients
         public void SendChatMessage(string text)
         {
             if (GetState() != ClientState.Connected) return;
-            var setColorInput = new NetworkObjectChatMessageRequest
+            var chatMessageInput = new NetworkObjectChatMessageRequest
             {
                 Room = currentRoomID,
                 Text = text,
             };
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
-                var payload = JsonConvert.SerializeObject(setColorInput);
+                var payload = JsonConvert.SerializeObject(chatMessageInput);
                 var content = new StringContent(payload, Encoding.UTF8, "application/json");
                 var task = client.PutAsync("api/chat", content);
                 return task.ContinueWith(responseTask =>
@@ -356,7 +359,7 @@ namespace BingoSync.Clients
             });
         }
 
-        private void ConnectToBroadcastSocket(NetworkObjectSocketJoinRequest socketJoin)
+        private void ConnectToBroadcastSocket(NetworkObjectSocketJoinRequest socketJoin, Action callback)
         {
             var socketUri = new Uri("wss://sockets.bingosync.com/broadcast");
             RetryHelper.RetryWithExponentialBackoff(() =>
@@ -377,6 +380,7 @@ namespace BingoSync.Clients
                     {
                         ConnectionStateChanged?.Invoke(this, new ClientStateUpdateInfo() { NewClientState = GetState() });
                         ListenForBoardUpdates(socketJoin);
+                        callback?.Invoke();
                     });
                 });
             }, maxRetries, nameof(ConnectToBroadcastSocket));
@@ -436,7 +440,7 @@ namespace BingoSync.Clients
             if (shouldConnect)
             {
                 Log($"socket is closed, will try to connect again");
-                ConnectToBroadcastSocket(socketJoin);
+                ConnectToBroadcastSocket(socketJoin, () => { });
                 return;
             }
         }

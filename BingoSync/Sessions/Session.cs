@@ -277,6 +277,11 @@ namespace BingoSync.Sessions
             return _client.GetState();
         }
 
+        public void SetColor(Colors color)
+        {
+            _client.SetColor(color);
+        }
+
         public void NewCard(List<BingoGoal> board, bool lockout = true, bool hideCard = true)
         {
             _client.NewCard(board, lockout, hideCard);

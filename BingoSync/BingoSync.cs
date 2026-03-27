@@ -12,7 +12,7 @@ namespace BingoSync
     {
         new public string GetName() => "BingoSync";
 
-        public static string version = "1.4.4.5";
+        public static string version = "1.4.4.6";
         public override string GetVersion() => version;
 
         private static readonly string DefaultSaveSettings = JsonConvert.SerializeObject(new SaveSettings());
