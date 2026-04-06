@@ -237,7 +237,7 @@ namespace BingoSync
 
         private static bool IsSolved(BingoSquare square)
         {
-            if (square.Condition.Solved && (!Controller.GlobalSettings.UnmarkGoals || !square.CanUnmark))
+            if (square.Condition.Solved && !square.CanUnmark)
                 return square.Condition.Solved;
             UpdateCondition(square.Condition);
             return square.Condition.Solved;

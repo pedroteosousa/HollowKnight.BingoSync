@@ -28,6 +28,7 @@ namespace BingoSync.Sessions
             }
         }
         public bool IsAutoMarking { get; set; }
+        public bool IsAutoUnmarking { get; set; } = false;
         public bool BoardIsVisible { get; set; } = true;
         private bool _handMode = false;
         public bool HandMode
@@ -162,12 +163,13 @@ namespace BingoSync.Sessions
 
     #endregion
 
-        public Session(string name, IRemoteClient client, bool markingClient)
+        public Session(string name, IRemoteClient client, bool isAutoMarking, bool isAutoUnmarking)
         {
             SessionName = name;
             _client = client;
             SubscribeEventRefires();
-            IsAutoMarking = markingClient;
+            IsAutoMarking = isAutoMarking;
+            IsAutoUnmarking = isAutoUnmarking;
             _client.SetBoard(Board);
             OnGoalUpdateReceived += DoAudioNotification;
             OnRoomSettingsReceived += ConsumeRoomSettings;
@@ -310,7 +312,10 @@ namespace BingoSync.Sessions
             {
                 if (square.Name == goalUpdate.Name)
                 {
-                    UpdateGoalBySlot(slot, goalUpdate);
+                    if (IsAutoUnmarking || !goalUpdate.Clear)
+                    {
+                        UpdateGoalBySlot(slot, goalUpdate);
+                    }
                 }
                 ++slot;
             }
@@ -377,7 +382,7 @@ namespace BingoSync.Sessions
 
         public void ProcessRoomHistory(Action<List<RoomEventInfo>> callback, Action errorCallback)
         {
-            _client.ProcessRoomHistory(callback, errorCallback);
+           _client.ProcessRoomHistory(callback, errorCallback);
         }
 
         public void DumpDebugInfo()
