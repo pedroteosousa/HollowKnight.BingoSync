@@ -49,6 +49,7 @@ namespace BingoSync.Interfaces
             GameModesManager.Setup(Log);
             MenuUI.Setup(Log);
             BingoBoardUI.Setup(Log);
+            SessionManager.Setup(Log);
 
             // creates a permanent GameObject which calls GlobalKeybindHelper.Update every frame
             GameObject.DontDestroyOnLoad(new GameObject("update_object", [typeof(GlobalKeybindHelper)]));
