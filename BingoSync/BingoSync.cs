@@ -4,7 +4,6 @@ using BingoSync.Interfaces;
 using BingoSync.ModMenu;
 using BingoSync.Settings;
 using Modding;
-using Newtonsoft.Json;
 
 namespace BingoSync
 {
@@ -12,7 +11,7 @@ namespace BingoSync
     {
         new public string GetName() => "BingoSync";
 
-        public static string version = "1.4.5.2";
+        public static string version = "1.4.5.3";
         public override string GetVersion() => version;
 
         public override void Initialize()
