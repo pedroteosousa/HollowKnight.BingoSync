@@ -392,7 +392,8 @@ namespace BingoSync.Sessions
 
         private void DoAudioNotification(object sender, GoalUpdateEventInfo goalUpdate)
         {
-            if (goalUpdate.Unmarking || !Board.IsAvailable || !Board.IsRevealed)
+            Session session = sender as Session;
+            if (goalUpdate.Unmarking || !Board.IsAvailable || !Board.IsRevealed || session.HandMode)
             {
                 return;
             }
