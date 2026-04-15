@@ -12,7 +12,7 @@ namespace BingoSync
     {
         new public string GetName() => "BingoSync";
 
-        public static string version = "1.4.5.1";
+        public static string version = "1.4.5.2";
         public override string GetVersion() => version;
 
         public override void Initialize()

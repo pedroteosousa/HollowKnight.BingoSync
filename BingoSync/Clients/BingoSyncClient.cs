@@ -474,7 +474,7 @@ namespace BingoSync.Clients
                     {
                         square.MarkedBy.Add(ColorExtensions.FromName(color));
                     }
-                    GoalUpdateReceived?.Invoke(this, NetworkGoalBroadcastToLocal(goalBroadcast, Board));
+                    GoalUpdateReceived?.Invoke(this, NetworkGoalBroadcastToLocal(goalBroadcast));
                     break;
                 }
             }
@@ -594,13 +594,13 @@ namespace BingoSync.Clients
                 {
                     "chat" => NetworkChatBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectChatBroadcast>(unparsedEvent.ToString())),
                     "new-card" => NetworkNewCardBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectNewCardBroadcast>(unparsedEvent.ToString())),
-                    "goal" => NetworkGoalBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectGoalBroadcast>(unparsedEvent.ToString()), Board),
+                    "goal" => NetworkGoalBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectGoalBroadcast>(unparsedEvent.ToString())),
                     "color" => NetworkColorBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectColorBroadcast>(unparsedEvent.ToString())),
                     "revealed" => NetworkRevealedBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectRevealedBroadcast>(unparsedEvent.ToString())),
                     "connection" => NetworkConnectionBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectConnectionBroadcast>(unparsedEvent.ToString())),
                     _ => null,
                 };
-                if(parsedEvent != null)
+                if (parsedEvent != null)
                 {
                     events.Add(parsedEvent);
                 }
@@ -666,7 +666,7 @@ namespace BingoSync.Clients
             };
         }
 
-        private static GoalUpdateEventInfo NetworkGoalBroadcastToLocal(NetworkObjectGoalBroadcast network, BingoBoard board)
+        private static GoalUpdateEventInfo NetworkGoalBroadcastToLocal(NetworkObjectGoalBroadcast network)
         {
             return new GoalUpdateEventInfo()
             {
@@ -674,10 +674,7 @@ namespace BingoSync.Clients
                 Timestamp = network.Timestamp,
                 Color = ColorExtensions.FromName(network.Color),
                 Goal = network.Square.Name,
-                Index = board.AllSquares.Select((square, index) => new { square, index })
-                              .Where(pair => pair.square.Name == network.Square.Name)
-                              .Select(pair => pair.index)
-                              .First(),
+                Index = int.Parse(network.Square.Slot.Substring(4)) - 1,
                 Unmarking = network.Remove,
             };
         }
