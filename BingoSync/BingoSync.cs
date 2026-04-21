@@ -4,7 +4,6 @@ using BingoSync.Interfaces;
 using BingoSync.ModMenu;
 using BingoSync.Settings;
 using Modding;
-using Newtonsoft.Json;
 
 namespace BingoSync
 {
@@ -12,10 +11,8 @@ namespace BingoSync
     {
         new public string GetName() => "BingoSync";
 
-        public static string version = "1.4.4.5";
+        public static string version = "1.4.5.5";
         public override string GetVersion() => version;
-
-        private static readonly string DefaultSaveSettings = JsonConvert.SerializeObject(new SaveSettings());
 
         public override void Initialize()
         {
@@ -36,13 +33,9 @@ namespace BingoSync
         public void OnLoadLocal(SaveSettings s)
         {
             GoalCompletionTracker.Variables = s;
-            if(JsonConvert.SerializeObject(s) == DefaultSaveSettings)
-            {
-                return;
-            }
+            GoalCompletionTracker.ClearFinishedGoals();
             if (Controller.GlobalSettings.MarkCompletedGoalsOnLoadSavefile)
             {
-                GoalCompletionTracker.ClearFinishedGoals();
                 GoalCompletionTracker.BroadcastAllGoalStates();
             }
         }

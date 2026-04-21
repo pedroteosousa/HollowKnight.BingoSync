@@ -80,17 +80,17 @@ namespace BingoSync.Interfaces
         /// <param name="name"></param>
         /// <param name="server"></param>
         /// <param name="isAutoMarking">Whether or not in-game events can mark goals. Marking goals manually with SelectSquare is always possible.</param>
+        /// <param name="isAutoUnmarking">Whether or not in-game events can unmark goals. Unmarking goals manually with SelectSquare is always possible.</param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public static Session CreateSession(string name, Servers server, bool isAutoMarking)
+        public static Session CreateSession(string name, Servers server, bool isAutoMarking, bool isAutoUnmarking)
         {
             IRemoteClient remoteClient = server switch
             {
                 Servers.BingoSync => new BingoSyncClient(Log),
                 _ => throw new NotImplementedException()
             };
-            Session session = new(name, remoteClient, isAutoMarking);
-            return session;
+            return new Session(name, remoteClient, isAutoMarking, isAutoUnmarking);
         }
 
         /// <summary>

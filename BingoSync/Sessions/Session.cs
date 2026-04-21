@@ -28,6 +28,7 @@ namespace BingoSync.Sessions
             }
         }
         public bool IsAutoMarking { get; set; }
+        public bool IsAutoUnmarking { get; set; } = false;
         public bool BoardIsVisible { get; set; } = true;
         private bool _handMode = false;
         public bool HandMode
@@ -64,6 +65,7 @@ namespace BingoSync.Sessions
             }
         }
         public bool RoomIsLockout { get; set; } = false;
+        public bool RoomHidCardInitially { get; set; } = false;
         public string RoomLink { get; set; } = string.Empty;
         public string RoomNickname { get; set; } = string.Empty;
         public string RoomPassword { get; set; } = string.Empty;
@@ -161,12 +163,13 @@ namespace BingoSync.Sessions
 
     #endregion
 
-        public Session(string name, IRemoteClient client, bool markingClient)
+        public Session(string name, IRemoteClient client, bool isAutoMarking, bool isAutoUnmarking)
         {
             SessionName = name;
             _client = client;
             SubscribeEventRefires();
-            IsAutoMarking = markingClient;
+            IsAutoMarking = isAutoMarking;
+            IsAutoUnmarking = isAutoUnmarking;
             _client.SetBoard(Board);
             OnGoalUpdateReceived += DoAudioNotification;
             OnRoomSettingsReceived += ConsumeRoomSettings;
@@ -186,6 +189,7 @@ namespace BingoSync.Sessions
         private void ConsumeRoomSettings(object sender, RoomSettings settings)
         {
             RoomIsLockout = settings.IsLockout;
+            RoomHidCardInitially = settings.HideCard;
         }
 
         private void MarkCompletedGoalsOnNewCard(object sender, NewCardEventInfo newCardEvent)
@@ -277,9 +281,14 @@ namespace BingoSync.Sessions
             return _client.GetState();
         }
 
-        public void NewCard(List<BingoGoal> board, bool lockout = true, bool hideCard = true)
+        public void SetColor(Colors color)
         {
-            _client.NewCard(board, lockout, hideCard);
+            _client.SetColor(color);
+        }
+
+        public void NewCard(List<BingoGoal> board, bool lockout = true, bool hideCard = true, int seed = 0)
+        {
+            _client.NewCard(board, lockout, hideCard, seed);
         }
 
         public void RevealCard()
@@ -303,7 +312,10 @@ namespace BingoSync.Sessions
             {
                 if (square.Name == goalUpdate.Name)
                 {
-                    UpdateGoalBySlot(slot, goalUpdate);
+                    if (IsAutoUnmarking || !goalUpdate.Clear)
+                    {
+                        UpdateGoalBySlot(slot, goalUpdate);
+                    }
                 }
                 ++slot;
             }
@@ -370,7 +382,7 @@ namespace BingoSync.Sessions
 
         public void ProcessRoomHistory(Action<List<RoomEventInfo>> callback, Action errorCallback)
         {
-            _client.ProcessRoomHistory(callback, errorCallback);
+           _client.ProcessRoomHistory(callback, errorCallback);
         }
 
         public void DumpDebugInfo()
@@ -380,7 +392,8 @@ namespace BingoSync.Sessions
 
         private void DoAudioNotification(object sender, GoalUpdateEventInfo goalUpdate)
         {
-            if (goalUpdate.Unmarking || !Board.IsAvailable || !Board.IsRevealed)
+            Session session = sender as Session;
+            if (goalUpdate.Unmarking || !Board.IsAvailable || !Board.IsRevealed || session.HandMode)
             {
                 return;
             }
@@ -390,7 +403,7 @@ namespace BingoSync.Sessions
                     break;
 
                 case AudioNotificationCondition.OtherPlayers:
-                    if(goalUpdate.Player.Name != RoomNickname)
+                    if(goalUpdate.Player.UUID != RoomPlayerUUID)
                     {
                         Controller.Audio.Play(ActiveAudioId);
                     }

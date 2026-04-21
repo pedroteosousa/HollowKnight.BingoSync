@@ -24,7 +24,7 @@ namespace BingoSync.Settings
         public KeyBinds Keybinds = new();
         public bool RevealCardOnGameStart = false;
         public bool RevealCardWhenOthersReveal = false;
-        public bool UnmarkGoals = false;
+        public bool DefaultSessionUnmarkGoals = false;
         public string DefaultNickname = "";
         public string DefaultPassword = "";
         public string DefaultColor = "red";

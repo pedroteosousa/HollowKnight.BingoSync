@@ -53,8 +53,12 @@ namespace BingoSync.ModMenu
                 name: "Unmark Goals",
                 description: "Some goals will be unmarked if their conditions are no longer met. WARNING: Can cause board inconsistencies on rare situations",
                 values: ["No", "Yes"],
-                applySetting: (index) => Controller.GlobalSettings.UnmarkGoals = (index == 1),
-                loadSetting: () => Controller.GlobalSettings.UnmarkGoals ? 1 : 0
+                applySetting: (index) =>
+                {
+                    Controller.GlobalSettings.DefaultSessionUnmarkGoals = (index == 1);
+                    Controller.DefaultSession.IsAutoUnmarking = (index == 1);
+                },
+                loadSetting: () => Controller.GlobalSettings.DefaultSessionUnmarkGoals ? 1 : 0
             );
 
             itemSyncSelector = new HorizontalOption(

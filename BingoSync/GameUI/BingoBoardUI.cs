@@ -115,6 +115,12 @@ namespace BingoSync.GameUI
             board.boardName.Visibility = Controller.ShowSessionName ? Visibility.Visible : Visibility.Hidden;
         }
 
+        public static void UpdateLockoutIndicator(bool lockout)
+        {
+            string indicator = lockout ? " (L)" : " (NL)";
+            revealCardButton.Content = "Reveal Card" + indicator;
+        }
+
         public static void SetBoardAlpha(float alpha)
         {
             board.SetAlpha(alpha);

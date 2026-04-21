@@ -188,10 +188,12 @@ namespace BingoSync.Clients
                         var socketJoin = JsonConvert.DeserializeObject<NetworkObjectSocketJoinRequest>(joinRoomResponse.Result);
                         socketKey = socketJoin.SocketKey;
                         RequestPlayerUUID(() => { });
-                        ConnectToBroadcastSocket(socketJoin);
+                        ConnectToBroadcastSocket(socketJoin, () =>
+                        {
+                            SetColor(color);
+                        });
                         RequestAndSetBoard(true, () => { }); 
                         UpdateSettings();
-                        SetColor(color.GetName());
                     });
                 }
                 catch (Exception _ex)
@@ -207,12 +209,13 @@ namespace BingoSync.Clients
             });
         }
 
-        private void SetColor(string color)
+        public void SetColor(Colors color)
         {
+            if (GetState() != ClientState.Connected) return;
             var setColorInput = new NetworkObjectSetColorRequest
             {
                 Room = currentRoomID,
-                Color = color,
+                Color = color.GetName(),
             };
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
@@ -227,7 +230,7 @@ namespace BingoSync.Clients
             }, maxRetries, nameof(SetColor));
         }
 
-        public void NewCard(List<BingoGoal> board, bool lockout = true, bool hideCard = true)
+        public void NewCard(List<BingoGoal> board, bool lockout = true, bool hideCard = true, int seed = 0)
         {
             if (GetState() != ClientState.Connected) return;
             var newCard = new NetworkObjectNewCardRequest
@@ -237,7 +240,7 @@ namespace BingoSync.Clients
                 Variant = 18, // but this is also required for custom ???
                 CustomJSON = JsonifyBoard(board),
                 Lockout = !lockout, // false is lockout here for some godforsaken reason
-                Seed = "",
+                Seed = $"{seed}",
                 HideCard = hideCard,
             };
             RetryHelper.RetryWithExponentialBackoff(() =>
@@ -286,14 +289,14 @@ namespace BingoSync.Clients
         public void SendChatMessage(string text)
         {
             if (GetState() != ClientState.Connected) return;
-            var setColorInput = new NetworkObjectChatMessageRequest
+            var chatMessageInput = new NetworkObjectChatMessageRequest
             {
                 Room = currentRoomID,
                 Text = text,
             };
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
-                var payload = JsonConvert.SerializeObject(setColorInput);
+                var payload = JsonConvert.SerializeObject(chatMessageInput);
                 var content = new StringContent(payload, Encoding.UTF8, "application/json");
                 var task = client.PutAsync("api/chat", content);
                 return task.ContinueWith(responseTask =>
@@ -356,7 +359,7 @@ namespace BingoSync.Clients
             });
         }
 
-        private void ConnectToBroadcastSocket(NetworkObjectSocketJoinRequest socketJoin)
+        private void ConnectToBroadcastSocket(NetworkObjectSocketJoinRequest socketJoin, Action callback)
         {
             var socketUri = new Uri("wss://sockets.bingosync.com/broadcast");
             RetryHelper.RetryWithExponentialBackoff(() =>
@@ -377,6 +380,7 @@ namespace BingoSync.Clients
                     {
                         ConnectionStateChanged?.Invoke(this, new ClientStateUpdateInfo() { NewClientState = GetState() });
                         ListenForBoardUpdates(socketJoin);
+                        callback?.Invoke();
                     });
                 });
             }, maxRetries, nameof(ConnectToBroadcastSocket));
@@ -436,7 +440,7 @@ namespace BingoSync.Clients
             if (shouldConnect)
             {
                 Log($"socket is closed, will try to connect again");
-                ConnectToBroadcastSocket(socketJoin);
+                ConnectToBroadcastSocket(socketJoin, () => { });
                 return;
             }
         }
@@ -470,7 +474,7 @@ namespace BingoSync.Clients
                     {
                         square.MarkedBy.Add(ColorExtensions.FromName(color));
                     }
-                    GoalUpdateReceived?.Invoke(this, NetworkGoalBroadcastToLocal(goalBroadcast, Board));
+                    GoalUpdateReceived?.Invoke(this, NetworkGoalBroadcastToLocal(goalBroadcast));
                     break;
                 }
             }
@@ -553,10 +557,7 @@ namespace BingoSync.Clients
                     readTask.ContinueWith(settingsResponse =>
                     {
                         var settings = JsonConvert.DeserializeObject<NetworkObjectRoomSettingsResponse>(settingsResponse.Result);
-                        RoomSettingsReceived(this, new RoomSettings()
-                        {
-                            IsLockout = settings.Settings.LockoutMode == LOCKOUT_MODE
-                        });
+                        RoomSettingsReceived?.Invoke(this, NetworkRoomSettingsToLocal(settings));
                     });
                 });
             }, maxRetries, nameof(UpdateSettings));
@@ -593,13 +594,13 @@ namespace BingoSync.Clients
                 {
                     "chat" => NetworkChatBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectChatBroadcast>(unparsedEvent.ToString())),
                     "new-card" => NetworkNewCardBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectNewCardBroadcast>(unparsedEvent.ToString())),
-                    "goal" => NetworkGoalBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectGoalBroadcast>(unparsedEvent.ToString()), Board),
+                    "goal" => NetworkGoalBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectGoalBroadcast>(unparsedEvent.ToString())),
                     "color" => NetworkColorBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectColorBroadcast>(unparsedEvent.ToString())),
                     "revealed" => NetworkRevealedBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectRevealedBroadcast>(unparsedEvent.ToString())),
                     "connection" => NetworkConnectionBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectConnectionBroadcast>(unparsedEvent.ToString())),
                     _ => null,
                 };
-                if(parsedEvent != null)
+                if (parsedEvent != null)
                 {
                     events.Add(parsedEvent);
                 }
@@ -617,6 +618,20 @@ namespace BingoSync.Clients
         }
 
         #region Network objects to internal broadcast objects
+
+        private static RoomSettings NetworkRoomSettingsToLocal(NetworkObjectRoomSettingsResponse network)
+        {
+            return new RoomSettings()
+            {
+                HideCard = network.Settings.HideCard,
+                IsLockout = network.Settings.LockoutMode == LOCKOUT_MODE,
+                GameName = network.Settings.GameName,
+                GameId = network.Settings.GameId,
+                VariantName = network.Settings.VariantName,
+                VariantId = network.Settings.VariantId,
+                Seed = network.Settings.Seed,
+            };
+        }
 
         private static PlayerInfo NetworkPlayerBroadcastToLocal(NetworkObjectPlayer network)
         {
@@ -651,7 +666,7 @@ namespace BingoSync.Clients
             };
         }
 
-        private static GoalUpdateEventInfo NetworkGoalBroadcastToLocal(NetworkObjectGoalBroadcast network, BingoBoard board)
+        private static GoalUpdateEventInfo NetworkGoalBroadcastToLocal(NetworkObjectGoalBroadcast network)
         {
             return new GoalUpdateEventInfo()
             {
@@ -659,10 +674,7 @@ namespace BingoSync.Clients
                 Timestamp = network.Timestamp,
                 Color = ColorExtensions.FromName(network.Color),
                 Goal = network.Square.Name,
-                Index = board.AllSquares.Select((square, index) => new { square, index })
-                              .Where(pair => pair.square.Name == network.Square.Name)
-                              .Select(pair => pair.index)
-                              .First(),
+                Index = int.Parse(network.Square.Slot.Substring(4)) - 1,
                 Unmarking = network.Remove,
             };
         }
@@ -919,8 +931,20 @@ namespace BingoSync.Clients
     [DataContract]
     class NetworkObjectRoomSettings
     {
+        [JsonProperty("hide_card")]
+        public bool HideCard = true;
         [JsonProperty("lockout_mode")]
         public string LockoutMode = string.Empty;
+        [JsonProperty("game")]
+        public string GameName = string.Empty;
+        [JsonProperty("game_id")]
+        public int GameId = 0;
+        [JsonProperty("variant")]
+        public string VariantName = string.Empty;
+        [JsonProperty("variant_id")]
+        public int VariantId = 0;
+        [JsonProperty("seed")]
+        public int Seed = 0;
     }
 
     [DataContract]

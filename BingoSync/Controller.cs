@@ -1,4 +1,5 @@
 ﻿using BingoSync.Clients;
+using BingoSync.Clients.EventInfoObjects;
 using BingoSync.CustomGoals;
 using BingoSync.GameUI;
 using BingoSync.Interfaces;
@@ -148,11 +149,13 @@ namespace BingoSync
         public static void Setup(Action<string> log)
         {
             Log = log;
-            DefaultSession = new Session("Default", new BingoSyncClient(log), true)
+            DefaultSession = new Session("Default", new BingoSyncClient(log), true, GlobalSettings.DefaultSessionUnmarkGoals)
             {
                 AudioNotificationOn = GlobalSettings.AudioNotificationOn
             };
             ActiveSession = DefaultSession;
+            ActiveSession.OnRoomSettingsReceived -= UpdateLockoutIndicatorOnNewCard;
+            ActiveSession.OnRoomSettingsReceived += UpdateLockoutIndicatorOnNewCard;
             OnBoardUpdate += BingoBoardUI.UpdateGrid;
             OnBoardUpdate += BingoBoardUI.UpdateName;
             OnBoardUpdate += ConfirmTopLeftOnReveal;
@@ -168,6 +171,10 @@ namespace BingoSync
         private static void OnSessionChanged(object _, Session previous)
         {
             RefreshGenerationButtonEnabled();
+            previous.OnRoomSettingsReceived -= UpdateLockoutIndicatorOnNewCard;
+            ActiveSession.OnRoomSettingsReceived -= UpdateLockoutIndicatorOnNewCard;
+            ActiveSession.OnRoomSettingsReceived += UpdateLockoutIndicatorOnNewCard;
+            BingoBoardUI.UpdateLockoutIndicator(ActiveSession.RoomIsLockout);
             RefreshUIWithSession(ActiveSession);
         }
 
@@ -180,6 +187,11 @@ namespace BingoSync
         public static void SetHandModeButtonState(bool handMode)
         {
             MenuUI.HandMode = handMode;
+        }
+
+        public static void UpdateLockoutIndicatorOnNewCard(object sender, RoomSettings settings)
+        {
+            BingoBoardUI.UpdateLockoutIndicator(settings.IsLockout);
         }
 
         public static void ToggleBoardKeybindClicked()
