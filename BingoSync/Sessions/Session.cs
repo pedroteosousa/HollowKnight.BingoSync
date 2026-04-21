@@ -286,9 +286,9 @@ namespace BingoSync.Sessions
             _client.SetColor(color);
         }
 
-        public void NewCard(List<BingoGoal> board, bool lockout = true, bool hideCard = true)
+        public void NewCard(List<BingoGoal> board, bool lockout = true, bool hideCard = true, int seed = 0)
         {
-            _client.NewCard(board, lockout, hideCard);
+            _client.NewCard(board, lockout, hideCard, seed);
         }
 
         public void RevealCard()

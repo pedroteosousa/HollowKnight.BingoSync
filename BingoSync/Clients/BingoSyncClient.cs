@@ -230,7 +230,7 @@ namespace BingoSync.Clients
             }, maxRetries, nameof(SetColor));
         }
 
-        public void NewCard(List<BingoGoal> board, bool lockout = true, bool hideCard = true)
+        public void NewCard(List<BingoGoal> board, bool lockout = true, bool hideCard = true, int seed = 0)
         {
             if (GetState() != ClientState.Connected) return;
             var newCard = new NetworkObjectNewCardRequest
@@ -240,7 +240,7 @@ namespace BingoSync.Clients
                 Variant = 18, // but this is also required for custom ???
                 CustomJSON = JsonifyBoard(board),
                 Lockout = !lockout, // false is lockout here for some godforsaken reason
-                Seed = "",
+                Seed = $"{seed}",
                 HideCard = hideCard,
             };
             RetryHelper.RetryWithExponentialBackoff(() =>
